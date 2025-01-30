@@ -9,6 +9,7 @@ import (
 	"strings"
 
 	"github.com/joho/godotenv"
+    util "github.com/naufalsuryasumirat/ayoradio/util"
 )
 
 // run gocron to run the function for arp-scan
@@ -50,6 +51,8 @@ func main() {
         if isIp && isMac {
             fmt.Printf("format: %v\n", tokens)
         }
+
+        util.AddDevice(mac)
 
         provider := tokens[2:]
         fmt.Println(ip, mac, provider)
