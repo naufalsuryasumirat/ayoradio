@@ -1,61 +1,48 @@
 package main
 
 import (
-	"bufio"
 	"fmt"
-	"os"
-	"os/exec"
-    "regexp"
-	"strings"
+	"log"
+	"time"
 
-	"github.com/joho/godotenv"
-    util "github.com/naufalsuryasumirat/ayoradio/util"
+	"github.com/go-co-op/gocron/v2"
+
+	job "github.com/naufalsuryasumirat/ayoradio/jobs"
+	_ "github.com/naufalsuryasumirat/ayoradio/util"
 )
 
 // run gocron to run the function for arp-scan
 func main() {
-	envs, err := godotenv.Read(".local.env")
-	if err != nil {
-		panic(err)
+	locals := job.ScanLocalDevices()
+	for _, l := range locals {
+		fmt.Printf("local{whitelisted}: %s", l)
 	}
 
-	device := envs["AYORADIO_INTERFACE"]
-	scanCmd := fmt.Sprintf("sudo arp-scan --interface=%s --localnet", device)
-	cmd := exec.Command("/bin/sh", "-c", scanCmd)
-	cmd.Stderr = os.Stderr
-	cmd.Stdin = os.Stdin
-
-	out, err := cmd.Output()
+	s, err := gocron.NewScheduler()
 	if err != nil {
-		fmt.Println(err)
+		log.Panic(err.Error())
 	}
 
-    regexIp := regexp.MustCompile("(([0-9]+).){3}([0-9]+)")
-    regexMac := regexp.MustCompile("([[:alnum:]]{2}:){5}([[:alnum:]]{2})")
-    scanner := bufio.NewScanner(strings.NewReader(string(out)))
-    for scanner.Scan() {
-        line := scanner.Text()
-        tokens := strings.Fields(line)
-        if len(tokens) < 3 {
-            continue
-        }
+	j, err := s.NewJob(
+		gocron.DurationJob(5*time.Minute),
+		gocron.NewTask(job.ScanLocalDevices),
+	)
+	if err != nil {
+		log.Panic(err.Error())
+	}
+	log.Printf("JobScan[ID]: %s\n", j.ID().String())
 
-        ip := tokens[0]
-        isIp := regexIp.Match([]byte(ip))
-        fmt.Printf("%s :: %t\n", ip, isIp)
+	j, err = s.NewJob(
+        gocron.DurationJob(24*time.Hour),
+        gocron.NewTask(job.LoadBlacklistedDevices),
+    )
+	log.Printf("JobLoad[ID]: %s\n", j.ID().String())
 
-        mac := tokens[1]
-        isMac := regexMac.Match([]byte(mac))
-        fmt.Printf("%s :: %t\n", mac, isMac)
+	s.Start()
 
-        if isIp && isMac {
-            fmt.Printf("format: %v\n", tokens)
-        }
-
-        util.AddDevice(mac)
-
-        provider := tokens[2:]
-        fmt.Println(ip, mac, provider)
+    select {
+    case <-time.After(time.Minute):
     }
-}
 
+	s.Shutdown()
+}
