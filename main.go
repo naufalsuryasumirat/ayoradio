@@ -1,8 +1,10 @@
 package main
 
 import (
-	"fmt"
 	"log"
+	"os"
+	"os/signal"
+	"syscall"
 	"time"
 
 	"github.com/go-co-op/gocron/v2"
@@ -11,38 +13,41 @@ import (
 	_ "github.com/naufalsuryasumirat/ayoradio/util"
 )
 
+// FIXME: temporary, delete
+const fname = "./tmp/sample.wav"
+
 // run gocron to run the function for arp-scan
 func main() {
-	locals := job.ScanLocalDevices()
-	for _, l := range locals {
-		fmt.Printf("local{whitelisted}: %s", l)
-	}
-
 	s, err := gocron.NewScheduler()
 	if err != nil {
 		log.Panic(err.Error())
 	}
 
-	j, err := s.NewJob(
-		gocron.DurationJob(5*time.Minute),
-		gocron.NewTask(job.ScanLocalDevices),
+    j, err := s.NewJob(
+        gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(7, 0, 0))),
+        gocron.NewTask(job.ResetSkipDay),
+    )
+
+	j, err = s.NewJob(
+		gocron.DurationJob(150 * time.Second),
+		gocron.NewTask(job.TurnOnRadio),
 	)
 	if err != nil {
 		log.Panic(err.Error())
 	}
-	log.Printf("JobScan[ID]: %s\n", j.ID().String())
+	log.Printf("JobRadio[ID]: %s\n", j.ID().String())
 
 	j, err = s.NewJob(
-        gocron.DurationJob(24*time.Hour),
+        gocron.DurationJob(24 * time.Hour),
         gocron.NewTask(job.LoadBlacklistedDevices),
     )
 	log.Printf("JobLoad[ID]: %s\n", j.ID().String())
 
 	s.Start()
 
-    select {
-    case <-time.After(time.Minute):
-    }
+    done := make(chan os.Signal, 1)
+    signal.Notify(done, syscall.SIGINT, syscall.SIGTERM)
+    <-done
 
 	s.Shutdown()
 }

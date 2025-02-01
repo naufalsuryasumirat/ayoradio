@@ -31,11 +31,14 @@ func ExistDevice(addr string) bool {
         return false
 	}
 
-	fmt.Printf("rows: %d\n", exist)
     return exist == 1
 }
 
 func ExistDevices(addrs []string) []string {
+    if addrs == nil {
+        return nil
+    }
+
     query := fmt.Sprintf(
         "SELECT mac_address FROM devices WHERE mac_address IN (%s);",
         strings.Repeat("?, ", len(addrs)-1) + "?",

@@ -2,3 +2,8 @@
 *.bak
 
 db/
+tmp/
+
+# binaries
+main
+ayoradio

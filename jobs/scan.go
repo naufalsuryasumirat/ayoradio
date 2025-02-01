@@ -37,8 +37,6 @@ func ScanLocalDevices() []string {
 	cmd.Stderr = os.Stderr
 	cmd.Stdin = os.Stdin
 
-    _ = cmd.Run()
-
 	out, err := cmd.Output()
 	if err != nil {
 		log.Println(err)
@@ -48,7 +46,7 @@ func ScanLocalDevices() []string {
 
     mu.RLock()
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
-	for scanner.Scan() {
+	for scanner.Scan() { // append recognized connected devices
 		line := scanner.Text()
 		tokens := strings.Fields(line)
 		if len(tokens) < 3 {
@@ -72,9 +70,12 @@ func ScanLocalDevices() []string {
 	return util.ExistDevices(locals)
 }
 
+func chk(err error) {
+	if err != nil {
+		log.Panic(err.Error())
+	}
+}
+
 func init() {
 	LoadBlacklistedDevices()
-	for device := range blacklisted {
-		fmt.Printf("blacklisted: %s\n", device)
-	}
 }

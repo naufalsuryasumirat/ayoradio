@@ -1,7 +1,13 @@
+github.com/blang/mpv v0.0.0-20160810175505-d56d7352e068 h1:P3ukpA1t7dgNIfe21LpB+zIBDQ1Dik9K1DMPdO/TcUA=
+github.com/blang/mpv v0.0.0-20160810175505-d56d7352e068/go.mod h1:E3TTEJpVApQMkhVk3Lr0sAmcbcclY3pGgPbRsy+rdlk=
+github.com/bobertlo/go-mpg123 v0.0.0-20211210004329-c83f21a0fd39 h1:VCejVrz3ZyFZbDZTAawyzqVTPvsqaYkDNriuvqI+Ul4=
+github.com/bobertlo/go-mpg123 v0.0.0-20211210004329-c83f21a0fd39/go.mod h1:mXbpHtCUpJj6n++mw/GWIxTeajLCSA7+uKHc9yP+WBI=
 github.com/go-co-op/gocron/v2 v2.15.0 h1:Kpvo71VSihE+RImmpA+3ta5CcMhoRzMGw4dJawrj4zo=
 github.com/go-co-op/gocron/v2 v2.15.0/go.mod h1:ZF70ZwEqz0OO4RBXE1sNxnANy/zvwLcattWEFsqpKig=
 github.com/google/uuid v1.6.0 h1:NIvaJDMOsjHA8n1jAhLSgzrAzy1Hgr+hNrb57e+94F0=
 github.com/google/uuid v1.6.0/go.mod h1:TIyPZe4MgqvfeYDBFedMoGGpEw/LqOeaOT+nhxU+yHo=
+github.com/gordonklaus/portaudio v0.0.0-20230709114228-aafa478834f5 h1:5AlozfqaVjGYGhms2OsdUyfdJME76E6rx5MdGpjzZpc=
+github.com/gordonklaus/portaudio v0.0.0-20230709114228-aafa478834f5/go.mod h1:WY8R6YKlI2ZI3UyzFk7P6yGSuS+hFwNtEzrexRyD7Es=
 github.com/joho/godotenv v1.5.1 h1:7eLL/+HRGLY0ldzfGMeQkb7vMd0as4CfYvUVzLqw0N0=
 github.com/joho/godotenv v1.5.1/go.mod h1:f4LDr5Voq0i2e/R5DDNOoa2zzDfwtkZa6DnEwAbqwq4=
 github.com/jonboulle/clockwork v0.4.0 h1:p4Cf1aMWXnXAUh8lVfewRBx1zaTSYKrKMF2g3ST4RZ4=
