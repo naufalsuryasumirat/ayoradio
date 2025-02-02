@@ -1,5 +1,6 @@
 .local.env
 *.bak
+*_templ.txt
 
 db/
 tmp/
@@ -7,3 +8,4 @@ tmp/
 # binaries
 main
 ayoradio
+tailwindcss

@@ -182,13 +182,11 @@ func startMpv() {
 		"--no-video",
 		fmt.Sprintf("--input-ipc-server=%s", os.Getenv("MPVSOCKET_PATH")),
 	)
-    fmt.Println(os.Getenv("MPVSOCKET_PATH"))
 	go func() {
         chk(cmd.Start())
 		chk(cmd.Wait())
 		chk(cmd.Process.Release())
 	}()
-    time.Sleep(1*time.Second)
 }
 
 func startClient() {
@@ -199,6 +197,6 @@ func startClient() {
 
 func init() {
 	startMpv()
-    startClient()
+    go startClient()
 	// dummy()
 }
