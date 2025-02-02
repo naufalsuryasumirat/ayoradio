@@ -72,7 +72,7 @@ func ScanLocalDevices() []string {
 
 func chk(err error) {
 	if err != nil {
-		log.Panic(err.Error())
+		log.Panic(err)
 	}
 }
 

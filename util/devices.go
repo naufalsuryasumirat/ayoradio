@@ -10,14 +10,14 @@ import (
 func AddDevice(addr string) {
 	_, err := db.Exec("INSERT OR IGNORE INTO devices (mac_address, blacklisted) VALUES (?, 0);", addr)
 	if err != nil {
-		log.Println(err.Error())
+		log.Println(err)
 	}
 }
 
 func AddBlacklistedDevice(addr string) {
     _, err := db.Exec("INSERT OR IGNORE INTO devices (mac_address, blacklisted) VALUES (?, 1);", addr)
     if err != nil {
-        log.Println(err.Error())
+        log.Println(err)
     }
 }
 
@@ -26,7 +26,7 @@ func ExistDevice(addr string) bool {
     err := db.QueryRow("SELECT COUNT(1) FROM devices WHERE mac_address = ?", addr).Scan(&exist)
 	if err != nil {
         if err != sql.ErrNoRows {
-            log.Println(err.Error())
+            log.Println(err)
         }
         return false
 	}

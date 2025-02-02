@@ -21,7 +21,7 @@ func connectDB() {
 
 	testDB, err := sql.Open("sqlite3", string(os.Getenv("DB_PATH")))
 	if err != nil {
-		log.Panic(err.Error())
+		log.Panic(err)
 	}
 
 	db = testDB
@@ -30,7 +30,7 @@ func connectDB() {
 func migrateDB() {
 	testDB, err := sql.Open("sqlite3", string(os.Getenv("DB_PATH")))
 	if err != nil {
-		log.Panic(err.Error())
+		log.Panic(err)
 	}
 	db = testDB
 	defer db.Close()
@@ -44,7 +44,7 @@ func migrateDB() {
         );
     `)
 	if err != nil {
-		log.Panic(err.Error())
+		log.Panic(err)
 	}
 }
 

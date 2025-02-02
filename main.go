@@ -9,18 +9,15 @@ import (
 
 	"github.com/go-co-op/gocron/v2"
 
-	job "github.com/naufalsuryasumirat/ayoradio/jobs"
 	_ "github.com/naufalsuryasumirat/ayoradio/util"
+	job "github.com/naufalsuryasumirat/ayoradio/jobs"
 )
-
-// FIXME: temporary, delete
-const fname = "./tmp/sample.wav"
 
 // run gocron to run the function for arp-scan
 func main() {
 	s, err := gocron.NewScheduler()
 	if err != nil {
-		log.Panic(err.Error())
+		log.Panic(err)
 	}
 
     j, err := s.NewJob(
@@ -33,7 +30,7 @@ func main() {
 		gocron.NewTask(job.TurnOnRadio),
 	)
 	if err != nil {
-		log.Panic(err.Error())
+		log.Panic(err)
 	}
 	log.Printf("JobRadio[ID]: %s\n", j.ID().String())
 

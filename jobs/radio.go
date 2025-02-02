@@ -20,24 +20,77 @@ var c *mpv.Client
 var skipDay bool = false
 var muD sync.RWMutex
 
-func PlayAudioLink(link string) {
+// lofi girl link
+const linkDefault string = "https://www.youtube.com/watch?v=jfKfPfyJRdk"
+var fnameDefault string = func() string {
+    url, _ := url.Parse(linkDefault)
+    return url.RawQuery
+}()
+
+const volumeIncrement float64 = .05
+
+func PlayLink(link string) {
     _, err := url.Parse(link)
     if err != nil {
-        log.Println(err.Error())
+        log.Println(err)
+        return
+    }
+
+    playAudio(link, false)
+}
+
+func PlayFile(fpath string) {
+    if !filepath.IsAbs(fpath) {
+		var err error
+		fpath, err = filepath.Abs(fpath)
+        if err != nil {
+            log.Println(err)
+        }
+	}
+
+    playAudio(fpath, false)
+}
+
+func QueueLink(link string) {
+    _, err := url.Parse(link)
+    if err != nil {
+        log.Println(err)
         return
     }
 
     playAudio(link, true)
 }
 
-func PlayAudioFile(fpath string) {
+func QueueFile(fpath string) {
     if !filepath.IsAbs(fpath) {
 		var err error
 		fpath, err = filepath.Abs(fpath)
-		chk(err)
+        if err != nil {
+            log.Println(err)
+        }
 	}
 
     playAudio(fpath, true)
+}
+
+func PlayNext() {
+    chk(c.PlaylistNext())
+}
+
+func PlayPrev() {
+    chk(c.PlaylistPrevious())
+}
+
+func VolumeInc() {
+    v, err := c.Volume()
+    chk(err)
+    c.SetProperty("volume", v + volumeIncrement)
+}
+
+func VolumeDecrease() {
+    v, err := c.Volume()
+    chk(err)
+    c.SetProperty("volume", (v - volumeIncrement))
 }
 
 func playAudio(in string, queue bool) bool {
@@ -67,29 +120,36 @@ func TurnOnRadio() {
         return
     }
 
-    // paused, _ := c.Pause()
-    // fname, _ := c.Filename()
-    idling, _ := c.Idle()
-    if !idling {
-        return
-    }
+    fname, _ := c.Filename()
+    nofile := fname == "<nil>"
 
     devices := ScanLocalDevices()
-    if devices == nil {
-        TurnOffRadio()
+    noCon := len(devices) == 0
+    if noCon {
+        if !nofile {
+            TurnOffRadio()
+        }
         return
     }
 
-	// const linkDefault = "https://www.youtube.com/watch?v=jfKfPfyJRdk"
- //    playAudio(linkDefault, false)
-    PlayAudioFile("./tmp/sample.wav")
+    // defaultPlaying := false
+    // if idx := strings.IndexRune(fname, '?'); idx >= 0 {
+    //     qname := fname[idx+1:]
+    //     defaultPlaying = qname == fnameDefault
+    // }
+
+    if !nofile { // file playing, and device connected
+        return
+    }
+
+    log.Printf("Device connected, playing default link: %s\n", linkDefault)
+    playAudio(linkDefault, false)
 }
 
-// TEST: check if sets idle
 func TurnOffRadio() {
     err := c.SetPause(true)
     chk(err)
-    c.SetProperty("idle", true)
+    c.Loadfile("", mpv.LoadFileModeReplace)
 }
 
 func SkipToday() {
@@ -109,9 +169,10 @@ func ResetSkipDay() {
 }
 
 func dummy() {
-	PlayAudioFile("./tmp/sample.wap")
     time.Sleep(time.Duration(2*time.Second))
-    PlayAudioFile("./tmp/sample.mp3")
+    PlayLink(linkDefault)
+    cur, _ := c.Filename()
+    fmt.Printf("playing: %s\n", cur)
 }
 
 func startMpv() {
@@ -121,11 +182,13 @@ func startMpv() {
 		"--no-video",
 		fmt.Sprintf("--input-ipc-server=%s", os.Getenv("MPVSOCKET_PATH")),
 	)
+    fmt.Println(os.Getenv("MPVSOCKET_PATH"))
 	go func() {
-		chk(cmd.Start())
+        chk(cmd.Start())
 		chk(cmd.Wait())
 		chk(cmd.Process.Release())
 	}()
+    time.Sleep(1*time.Second)
 }
 
 func startClient() {
@@ -135,7 +198,7 @@ func startClient() {
 }
 
 func init() {
-	// startMpv()
+	startMpv()
     startClient()
 	// dummy()
 }
