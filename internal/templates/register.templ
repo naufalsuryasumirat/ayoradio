@@ -1,0 +1,44 @@
+package templates
+
+templ RegisterPage() {
+    <div class="flex flex-col items-center p-4"
+        hx-ext="response-targets">
+        <h1 class="text-center text-2xl mb-4">
+            Register a device
+        </h1>
+        <form class="flex flex-col items-center pt-8"
+            hx-post="/register"
+            hx-trigger="submit throttle:5s"
+            hx-target-400="#error">
+			<div class="flex items-center mb-4" id="error"></div>
+			<div>
+				<label for="mac">MAC</label>
+				<input type="text"
+                    name="mac"
+                    id="mac"
+                    placeholder="a1:b2:c3:d4:e5:f6"
+                    required=""/>
+			</div>
+            <div class="flex space-x-4 items-center mt-8">
+                <button id="whitelist" name="type" value="whitelist" class={ normalButton } type="submit">
+                    Whitelist
+                </button>
+                <button id="blacklist" name="type" value="blacklist" class={ normalButton } type="submit">
+                    Blacklist
+                </button>
+            </div>
+        </form>
+    </div>
+}
+
+templ RegisterSuccess() {
+	<h1>Registration successful</h1>
+	<p>Go to <a href="">home</a></p>
+}
+
+templ RegisterError() {
+	<div class="flex flex-col items-center text-white text-center mb-4">
+		<h1>Registration failed</h1>
+		<p>There was an error registering your device</p>
+	</div>
+}

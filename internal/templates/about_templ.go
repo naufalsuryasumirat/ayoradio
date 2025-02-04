@@ -29,7 +29,7 @@ func About() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div>This is the about page [ TODO ]</div>")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div class=\"flex flex-col items-center\"><h1 class=\"text-xl p-4\">ayoradio</h1><div class=\"text-white text-center\">small web utility, utilizing arp-scan, go's os/exec, and gocron <br>detects local devices presence (mobile-phone) and plays bgm beats to relax/study to <br>also features custom-playback, playlist, and default controls (obv) <br>design by me (naufal.suryasumirat), flawless ui design amirite? <br>built with golang, templ, tailwind css, htmx (GOTTH stack) <br>running on debian bookworm 12.9 (rpi 5) <br>mandatory fastfetch output: <br></div><img class=\"rounded pt-8\" src=\"./static/images/fastfetch-rpi.png\" width=\"300\" height=\"300\"></div>")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}

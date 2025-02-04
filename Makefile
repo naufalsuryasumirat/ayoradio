@@ -36,4 +36,4 @@ dev:
 build:
 	make tailwind-build
 	make templ-generate
-	go build -ldflags "-X main.AYORADIO_MODE=PRODUCTION" -o ./bin/$(APP_NAME) ./cmd/main.go
+	go build -ldflags "-X main.AYORADIO_MODE=PRODUCTION" -o ./bin/$(APP_NAME) ./main.go

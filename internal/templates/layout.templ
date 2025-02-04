@@ -1,6 +1,8 @@
 package templates
 
 import (
+    "os"
+
 	"github.com/naufalsuryasumirat/ayoradio/internal/middleware"
 )
 
@@ -8,11 +10,14 @@ templ header(title string) {
 	<head>
 		<title>{ title }</title>
 		<meta charset="UTF-8"/>
-		<meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+		<meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no"/>
 		<script src="/static/script/htmx.min.js" nonce={ middleware.GetHtmxNonce(ctx) }></script>
 		<script src="/static/script/response-targets.js" nonce={ middleware.GetResponseTargetsNonce(ctx) }></script>
-		//<link rel="stylesheet" href="/static/css/style.min.css" nonce={ middleware.GetTwNonce(ctx) }/>
-		<link rel="stylesheet" href="/static/css/style.css" nonce={ middleware.GetTwNonce(ctx) }/>
+        if os.Getenv("AYORADIO_MODE") == "PRODUCTION" {
+            <link rel="stylesheet" href="/static/css/style.min.css" nonce={ middleware.GetTwNonce(ctx) }/>
+        } else {
+            <link rel="stylesheet" href="/static/css/style.css" nonce={ middleware.GetTwNonce(ctx) }/>
+        }
 	</head>
 }
 
@@ -31,15 +36,20 @@ templ nav() {
 					<a class="text-gray-200" href="/about">About</a>
 				</li>
 			</ol>
+			<ol class="flex space-x-4">
+				<li>
+					<a class="text-gray-200" href="/register">Register</a>
+				</li>
+            </ol>
 		</div>
 	</nav>
 }
 
 templ Layout(contents templ.Component, title string) {
 	@header(title)
-	<body class="flex flex-col h-full">
+	<body class="flex flex-col h-full overflow-auto">
 		@nav()
-		<main class="flex-1 container">
+		<main class="flex-1 flex-col items-center container">
 			@contents
 		</main>
 		@footer()
