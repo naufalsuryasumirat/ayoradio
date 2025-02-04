@@ -6,7 +6,6 @@ import (
 	"log"
 	"net/http"
 	"os"
-	"os/exec"
 	"os/signal"
 	"syscall"
 	"time"
@@ -21,13 +20,6 @@ import (
 	_ "github.com/naufalsuryasumirat/ayoradio/util"
 )
 
-const mode = "DEVELOPMENT"
-
-func init() {
-	os.Setenv("AYORADIO_MODE", mode)
-	exec.Command("tailwindcss", "-i ./static/css/input.css", "-o ./static/css/style.css", "--watch").Run()
-}
-
 // run gocron to run the function for arp-scan
 func main() {
 	s, err := gocron.NewScheduler()
@@ -41,14 +33,22 @@ func main() {
 	)
 	log.Printf("JobReset[ID]: %s\n", j.ID().String())
 
-	// j, err = s.NewJob(
-	// 	gocron.DurationJob(150 * time.Second),
-	// 	gocron.NewTask(job.TurnOnRadio),
-	// )
-	// if err != nil {
-	// 	log.Panic(err)
-	// }
-	// log.Printf("JobRadio[ID]: %s\n", j.ID().String())
+    is_prod := os.Getenv("AYORADIO_MODE") == "PRODUCTION"
+
+    if is_prod {
+        go func() {
+            time.Sleep(5 * time.Second)
+            job.TurnOnRadio()
+        }()
+        j, err = s.NewJob(
+            gocron.DurationJob(150 * time.Second),
+            gocron.NewTask(job.TurnOnRadio),
+        )
+        if err != nil {
+            log.Panic(err)
+        }
+        log.Printf("JobRadio[ID]: %s\n", j.ID().String())
+    }
 
 	j, err = s.NewJob(
 		gocron.DurationJob(24*time.Hour),
@@ -74,10 +74,24 @@ func main() {
 
 		r.Get("/", handlers.NewHomeHandler().ServeHTTP)
 		r.Get("/about", handlers.NewAboutHandler().ServeHTTP)
+		r.Get("/register", handlers.NewGetRegisterHandler().ServeHTTP)
+		r.Post("/register", handlers.NewPostRegisterHandler().ServeHTTP)
+		r.Get("/volume", handlers.NewControlsHandler().Volume)
+		r.Post("/volume-up", handlers.NewControlsHandler().VolumeUp)
+		r.Post("/volume-down", handlers.NewControlsHandler().VolumeDown)
+		r.Post("/play", handlers.NewControlsHandler().Play)
+		r.Post("/playlist", handlers.NewControlsHandler().Playlist)
+		r.Get("/playing", handlers.NewControlsHandler().CurrentPlaying)
 	})
 
 	srv := &http.Server{
-		Addr:    ":3000",
+		Addr:    func() string {
+            if is_prod {
+                return ":3000"
+            } else {
+                return ":3003"
+            }
+        }(),
 		Handler: r,
 	}
 

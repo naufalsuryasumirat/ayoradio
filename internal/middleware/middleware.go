@@ -46,11 +46,21 @@ func CSPMiddleware(next http.Handler) http.Handler {
 		// set nonces in context
 		ctx := context.WithValue(r.Context(), NonceKey, nonceSet)
 		// insert the nonces into the content security policy header
-		cspHeader := fmt.Sprintf("default-src 'self'; script-src 'nonce-%s' 'nonce-%s' ; style-src 'nonce-%s' '%s';",
+		// cspHeader := fmt.Sprintf(
+  //           `default-src 'self';
+  //               img-src 'self' https://img.youtube.com;
+  //               script-src 'nonce-%s' 'nonce-%s';
+  //               style-src 'nonce-%s' '%s';`, // %s
+		// 	nonceSet.Htmx,
+		// 	nonceSet.ResponseTargets,
+		// 	nonceSet.Tw,
+		// 	nonceSet.HtmxCSSHash)
+		cspHeader := fmt.Sprintf(
+            `default-src 'self';
+                img-src 'self' https://img.youtube.com;
+                script-src 'nonce-%s' 'nonce-%s';`,
 			nonceSet.Htmx,
-			nonceSet.ResponseTargets,
-			nonceSet.Tw,
-			nonceSet.HtmxCSSHash)
+			nonceSet.ResponseTargets)
 		w.Header().Set("Content-Security-Policy", cspHeader)
 
 		next.ServeHTTP(w, r.WithContext(ctx))

@@ -4,8 +4,45 @@ import (
 	"database/sql"
 	"fmt"
 	"log"
+    "regexp"
 	"strings"
 )
+
+var regexMac = regexp.MustCompile("([[:alnum:]]{2}:){5}([[:alnum:]]{2})")
+
+func TryAddDevice(addr string, blacklisted bool) error {
+    if !regexMac.Match([]byte(addr)) {
+        return fmt.Errorf("not a mac address")
+    }
+
+	res, err := db.Exec(
+        fmt.Sprintf(
+            "INSERT OR IGNORE INTO devices (mac_address, blacklisted) VALUES (?, %d);",
+            func() int {
+                if blacklisted {
+                    return 1
+                } else {
+                    return 0
+                }
+            }(),
+        ),
+        addr,
+    )
+    if err != nil {
+        return err
+    }
+
+    aff, err := res.RowsAffected()
+    if err != nil {
+        return err
+    }
+
+    if aff == 0 {
+        return fmt.Errorf("device already exist")
+    }
+
+    return nil
+}
 
 func AddDevice(addr string) {
 	_, err := db.Exec("INSERT OR IGNORE INTO devices (mac_address, blacklisted) VALUES (?, 0);", addr)
