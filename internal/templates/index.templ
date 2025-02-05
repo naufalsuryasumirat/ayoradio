@@ -16,7 +16,7 @@ const normalButton = `
 `
 
 templ Index() {
-    <div hx-ext="reponse-targets" class="flex flex-col items-center h-full p-4">
+    <div hx-ext="response-targets" class="flex flex-col items-center h-full p-4">
         <h1 class="text-center text-2xl mb-4">
             Welcome home
         </h1>
@@ -28,8 +28,7 @@ templ Index() {
                 hx-target="#idle">
                 -
             </button>
-            <label
-                hx-get="/volume"
+            <label hx-get="/volume"
                 hx-trigger="load,
                     click from:#vol_down delay:100ms,
                     click from:#vol_up delay:100ms"
@@ -43,7 +42,16 @@ templ Index() {
             </button>
         </div>
 
-        <div class="m-5">
+        <div class="m-5 rounded"
+            id="cur-playing"
+            hx-get="/playing"
+            hx-trigger="
+                load,
+                every 5s,
+                click from:#play_next delay:250ms,
+                click from:#play_prev delay:250ms"
+            hx-target="this"
+            hx-swap="innerHTML">
             @CurPlaying("")
         </div>
 
@@ -96,18 +104,11 @@ templ Index() {
     </div>
 }
 
-// TODO: load once, update every 30s
 templ CurPlaying(addr string) {
-    <img class="m-4 rounded"
-        id="cur-playing"
-        hx-get="/playing"
-        hx-trigger="
-            every 30s,
-            click from:#play_next delay:250ms,
-            click from:#play_prev delay:250ms"
-        hx-target="this"
+    <img class="rounded"
+        alt="current playing"
         if len(addr) == 0 {
-            src="./static/images/logo.png"
+            src="/static/images/logo.png"
             width=225
             height=225
         } else {
@@ -115,5 +116,5 @@ templ CurPlaying(addr string) {
             width=400
             height=400
         }
-        alt="curent playing"/>
+    />
 }

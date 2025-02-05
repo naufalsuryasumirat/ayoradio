@@ -147,18 +147,18 @@ func TurnOnRadio() {
 		return
 	}
 
-	// defaultPlaying := false
-	// if idx := strings.IndexRune(fname, '?'); idx >= 0 {
-	//     qname := fname[idx+1:]
-	//     defaultPlaying = qname == fnameDefault
-	// }
-
 	if !nofile { // file playing, and device connected
 		return
 	}
 
 	log.Printf("Device connected, playing default link: %s\n", linkDefault)
 	playAudio(linkDefault, false)
+
+    if !skipDay {
+        var alias = os.Getenv("WAKE_DEVICE")
+        log.Printf("Device connected, waking %s", alias)
+        exec.Command("wol", "wake", alias).Output()
+    }
 }
 
 func TurnOffRadio() {

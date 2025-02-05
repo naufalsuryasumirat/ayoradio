@@ -33,22 +33,22 @@ func main() {
 	)
 	log.Printf("JobReset[ID]: %s\n", j.ID().String())
 
-    is_prod := os.Getenv("AYORADIO_MODE") == "PRODUCTION"
+	is_prod := os.Getenv("AYORADIO_MODE") == "PRODUCTION"
 
-    if is_prod {
-        go func() {
-            time.Sleep(5 * time.Second)
-            job.TurnOnRadio()
-        }()
-        j, err = s.NewJob(
-            gocron.DurationJob(150 * time.Second),
-            gocron.NewTask(job.TurnOnRadio),
-        )
-        if err != nil {
-            log.Panic(err)
-        }
-        log.Printf("JobRadio[ID]: %s\n", j.ID().String())
-    }
+	if is_prod {
+		go func() {
+			time.Sleep(5 * time.Second)
+			job.TurnOnRadio()
+		}()
+		j, err = s.NewJob(
+			gocron.DurationJob(150*time.Second),
+			gocron.NewTask(job.TurnOnRadio),
+		)
+		if err != nil {
+			log.Panic(err)
+		}
+		log.Printf("JobRadio[ID]: %s\n", j.ID().String())
+	}
 
 	j, err = s.NewJob(
 		gocron.DurationJob(24*time.Hour),
@@ -57,11 +57,14 @@ func main() {
 	log.Printf("JobLoad[ID]: %s\n", j.ID().String())
 
 	s.Start()
-    defer s.Shutdown()
+	defer s.Shutdown()
 
 	r := chi.NewRouter()
 	fileServer := http.FileServer(http.Dir("./static"))
 	r.Handle("/static/*", http.StripPrefix("/static/", fileServer))
+    r.HandleFunc("/favicon.ico", func(w http.ResponseWriter, r *http.Request) {
+        http.ServeFile(w, r, "./favicon.ico")
+    })
 
 	r.Group(func(r chi.Router) {
 		r.Use(
@@ -85,13 +88,13 @@ func main() {
 	})
 
 	srv := &http.Server{
-		Addr:    func() string {
-            if is_prod {
-                return ":3000"
-            } else {
-                return ":3003"
-            }
-        }(),
+		Addr: func() string {
+			if is_prod {
+				return ":3000"
+			} else {
+				return ":3003"
+			}
+		}(),
 		Handler: r,
 	}
 
@@ -120,5 +123,5 @@ func main() {
 		log.Panic(err, "Server shutdown failed")
 	}
 
-    log.Println("Server shutdown complete")
+	log.Println("Server shutdown complete")
 }

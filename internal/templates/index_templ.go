@@ -44,7 +44,7 @@ func Index() templ.Component {
 			templ_7745c5c3_Var1 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div hx-ext=\"reponse-targets\" class=\"flex flex-col items-center h-full p-4\"><h1 class=\"text-center text-2xl mb-4\">Welcome home</h1><div id=\"idle\"></div><div class=\"flex space-x-4\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 1, "<div hx-ext=\"response-targets\" class=\"flex flex-col items-center h-full p-4\"><h1 class=\"text-center text-2xl mb-4\">Welcome home</h1><div id=\"idle\"></div><div class=\"flex space-x-4\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -88,7 +88,7 @@ func Index() templ.Component {
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" id=\"vol_up\" hx-post=\"/volume-up\" hx-target=\"#idle\">+</button></div><div class=\"m-5\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 5, "\" id=\"vol_up\" hx-post=\"/volume-up\" hx-target=\"#idle\">+</button></div><div class=\"m-5 rounded\" id=\"cur-playing\" hx-get=\"/playing\" hx-trigger=\"\n                load,\n                every 5s,\n                click from:#play_next delay:250ms,\n                click from:#play_prev delay:250ms\" hx-target=\"this\" hx-swap=\"innerHTML\">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
@@ -192,7 +192,6 @@ func Index() templ.Component {
 	})
 }
 
-// TODO: load once, update every 30s
 func CurPlaying(addr string) templ.Component {
 	return templruntime.GeneratedTemplate(func(templ_7745c5c3_Input templruntime.GeneratedComponentInput) (templ_7745c5c3_Err error) {
 		templ_7745c5c3_W, ctx := templ_7745c5c3_Input.Writer, templ_7745c5c3_Input.Context
@@ -214,12 +213,12 @@ func CurPlaying(addr string) templ.Component {
 			templ_7745c5c3_Var14 = templ.NopComponent
 		}
 		ctx = templ.ClearChildren(ctx)
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<img class=\"m-4 rounded\" id=\"cur-playing\" hx-get=\"/playing\" hx-trigger=\"\n            every 30s,\n            click from:#play_next delay:250ms,\n            click from:#play_prev delay:250ms\" hx-target=\"this\"")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 15, "<img class=\"rounded\" alt=\"current playing\"")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
 		if len(addr) == 0 {
-			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " src=\"./static/images/logo.png\" width=\"225\" height=\"225\"")
+			templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 16, " src=\"/static/images/logo.png\" width=\"225\" height=\"225\"")
 			if templ_7745c5c3_Err != nil {
 				return templ_7745c5c3_Err
 			}
@@ -231,7 +230,7 @@ func CurPlaying(addr string) templ.Component {
 			var templ_7745c5c3_Var15 string
 			templ_7745c5c3_Var15, templ_7745c5c3_Err = templ.JoinStringErrs(addr)
 			if templ_7745c5c3_Err != nil {
-				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 114, Col: 22}
+				return templ.Error{Err: templ_7745c5c3_Err, FileName: `internal/templates/index.templ`, Line: 115, Col: 22}
 			}
 			_, templ_7745c5c3_Err = templ_7745c5c3_Buffer.WriteString(templ.EscapeString(templ_7745c5c3_Var15))
 			if templ_7745c5c3_Err != nil {
@@ -242,7 +241,7 @@ func CurPlaying(addr string) templ.Component {
 				return templ_7745c5c3_Err
 			}
 		}
-		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, " alt=\"curent playing\">")
+		templ_7745c5c3_Err = templruntime.WriteString(templ_7745c5c3_Buffer, 19, ">")
 		if templ_7745c5c3_Err != nil {
 			return templ_7745c5c3_Err
 		}
