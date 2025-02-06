@@ -48,6 +48,15 @@ func main() {
 			log.Panic(err)
 		}
 		log.Printf("JobRadio[ID]: %s\n", j.ID().String())
+
+        j, err = s.NewJob(
+            gocron.DurationJob(300*time.Second),
+            gocron.NewTask(job.TurnOnDevice),
+        )
+        if err != nil {
+            log.Panic(err)
+        }
+        log.Printf("JobWake[ID]: %s\n", j.ID().String())
 	}
 
 	j, err = s.NewJob(

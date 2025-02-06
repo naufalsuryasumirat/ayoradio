@@ -129,11 +129,8 @@ func playAudio(in string, queue bool) bool {
 
 // scheduled turn on radio default, won't run if skipped for the day
 func TurnOnRadio() {
-	muD.RLock()
-	defer muD.RUnlock()
-	if skipDay {
-		return
-	}
+    muD.RLock()
+    defer muD.RUnlock()
 
 	fname, _ := c.Filename()
 	nofile := fname == "<nil>"
@@ -154,11 +151,19 @@ func TurnOnRadio() {
 	log.Printf("Device connected, playing default link: %s\n", linkDefault)
 	playAudio(linkDefault, false)
 
-    if !skipDay {
-        var alias = os.Getenv("WAKE_DEVICE")
-        log.Printf("Device connected, waking %s", alias)
-        exec.Command("wol", "wake", alias).Output()
+    now := time.Now()
+    location := now.Location()
+    start := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 0, location)
+    end := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, location)
+    if skipDay || now.Before(start) || now.After(end) {
+        return
     }
+
+    var alias = os.Getenv("WAKE_DEVICE")
+    log.Printf("Device connected, waking %s", alias)
+    exec.Command("wol", "wake", alias).Output()
+
+    SkipToday()
 }
 
 func TurnOffRadio() {
