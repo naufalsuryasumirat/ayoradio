@@ -28,7 +28,7 @@ func main() {
 	}
 
 	j, err := s.NewJob(
-		gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(7, 0, 0))),
+		gocron.DailyJob(1, gocron.NewAtTimes(gocron.NewAtTime(10, 0, 0))),
 		gocron.NewTask(job.ResetSkipDay),
 	)
 	log.Printf("JobReset[ID]: %s\n", j.ID().String())
@@ -48,15 +48,6 @@ func main() {
 			log.Panic(err)
 		}
 		log.Printf("JobRadio[ID]: %s\n", j.ID().String())
-
-        j, err = s.NewJob(
-            gocron.DurationJob(300*time.Second),
-            gocron.NewTask(job.TurnOnDevice),
-        )
-        if err != nil {
-            log.Panic(err)
-        }
-        log.Printf("JobWake[ID]: %s\n", j.ID().String())
 	}
 
 	j, err = s.NewJob(
