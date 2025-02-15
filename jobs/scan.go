@@ -45,6 +45,7 @@ func ScanLocalDevices() []string {
 	var locals []string
 
     mu.RLock()
+    defer mu.RUnlock()
 	scanner := bufio.NewScanner(strings.NewReader(string(out)))
 	for scanner.Scan() { // append recognized connected devices
 		line := scanner.Text()
@@ -65,7 +66,6 @@ func ScanLocalDevices() []string {
 
 		_ = tokens[2:] // provider
 	}
-    mu.RUnlock()
 
 	return util.ExistDevices(locals)
 }

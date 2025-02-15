@@ -21,6 +21,9 @@ var c *mpv.Client
 var skipDay bool = false
 var muD sync.RWMutex
 
+const maxRetry = 5
+var retryCount = 0
+
 // lofi girl link
 const linkDefault string = "https://www.youtube.com/watch?v=jfKfPfyJRdk"
 
@@ -97,10 +100,10 @@ func VolumeDecrease() {
 
 func Volume() float64 {
 	v, err := c.Volume()
-    if (err != nil) {
-        log.Println(err)
-        return 30.
-    }
+	if err != nil {
+		log.Println(err)
+		return 30.
+	}
 	return v
 }
 
@@ -129,18 +132,21 @@ func playAudio(in string, queue bool) bool {
 
 // scheduled turn on radio default, won't run if skipped for the day
 func TurnOnRadio() {
-    muD.RLock()
-
 	fname, _ := c.Filename()
 	nofile := fname == "<nil>"
 
 	devices := ScanLocalDevices()
 	noCon := len(devices) == 0
 	if noCon {
-		if !nofile {
-			TurnOffRadio()
-		}
-		return
+        if nofile {
+            return
+        }
+
+        retryCount += 1
+        if retryCount >= maxRetry {
+            retryCount = 0
+            TurnOffRadio()
+        }
 	}
 
 	if !nofile { // file playing, and device connected
@@ -149,22 +155,35 @@ func TurnOnRadio() {
 
 	log.Printf("Device connected, playing default link: %s\n", linkDefault)
 	playAudio(linkDefault, false)
+}
 
-    now := time.Now()
-    location := now.Location()
-    start := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 0, location)
-    end := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, location)
-    if skipDay || now.Before(start) || now.After(end) {
+func TurnOnDevice() {
+    muD.RLock()
+    if skipDay {
         muD.RUnlock()
         return
     }
     muD.RUnlock()
 
-    var alias = os.Getenv("WAKE_DEVICE")
-    log.Printf("Device connected, waking %s", alias)
-    exec.Command("wol", "wake", alias).Output()
+	devices := ScanLocalDevices()
+	noCon := len(devices) == 0
+	if noCon {
+		return
+	}
 
-    SkipToday()
+	now := time.Now()
+	location := now.Location()
+	start := time.Date(now.Year(), now.Month(), now.Day(), 17, 0, 0, 0, location)
+	end := time.Date(now.Year(), now.Month(), now.Day(), 23, 59, 59, 0, location)
+	if now.Before(start) || now.After(end) {
+		return
+	}
+
+	var alias = os.Getenv("WAKE_DEVICE")
+	log.Printf("Device connected, waking '%s'", alias)
+	exec.Command("wol", "wake", alias).Output()
+
+	SkipToday()
 }
 
 func TurnOffRadio() {
@@ -175,16 +194,13 @@ func TurnOffRadio() {
 
 func SkipToday() {
 	muD.Lock()
-    defer muD.Unlock()
-	if skipDay {
-		return
-	}
-
 	skipDay = true
+	muD.Unlock()
 }
 
 func ResetSkipDay() {
 	muD.Lock()
+    log.Println("Resetting skipDay")
 	skipDay = false
 	muD.Unlock()
 }
@@ -195,15 +211,15 @@ func dummy() {
 }
 
 func CurrentPlaying() string {
-    fname, _ := c.Filename()
+	fname, _ := c.Filename()
 
 	if idx := strings.IndexRune(fname, '='); idx >= 0 {
 		qname := fname[idx+1:]
-        qname = strings.TrimSuffix(qname, "\"")
-        return fmt.Sprintf("https://img.youtube.com/vi/%s/maxresdefault.jpg", qname)
+		qname = strings.TrimSuffix(qname, "\"")
+		return fmt.Sprintf("https://img.youtube.com/vi/%s/maxresdefault.jpg", qname)
 	}
 
-    return ""
+	return ""
 }
 
 func startMpv() {

@@ -41,19 +41,33 @@ func main() {
 			job.TurnOnRadio()
 		}()
 		j, err = s.NewJob(
-			gocron.DurationJob(150*time.Second),
+			gocron.DurationJob(90*time.Second),
 			gocron.NewTask(job.TurnOnRadio),
 		)
 		if err != nil {
 			log.Panic(err)
 		}
+
 		log.Printf("JobRadio[ID]: %s\n", j.ID().String())
+
+		j, err = s.NewJob(
+			gocron.DurationJob(150*time.Second),
+			gocron.NewTask(job.TurnOnDevice),
+		)
+        if err != nil {
+            log.Panic(err)
+        }
+
+		log.Printf("JobDevice[ID]: %s\n", j.ID().String())
 	}
 
 	j, err = s.NewJob(
 		gocron.DurationJob(24*time.Hour),
 		gocron.NewTask(job.LoadBlacklistedDevices),
 	)
+    if err != nil {
+        log.Panic(err)
+    }
 	log.Printf("JobLoad[ID]: %s\n", j.ID().String())
 
 	s.Start()

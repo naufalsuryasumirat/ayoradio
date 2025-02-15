@@ -72,8 +72,9 @@ func ExistDevice(addr string) bool {
 }
 
 func ExistDevices(addrs []string) []string {
-    if addrs == nil {
-        return nil
+    var res []string
+    if addrs == nil || len(addrs) == 0 {
+        return res
     }
 
     query := fmt.Sprintf(
@@ -85,7 +86,6 @@ func ExistDevices(addrs []string) []string {
         args[i] = v
     }
 
-    var res []string
     row, _ := db.Query(query, args...)
     defer row.Close()
 
